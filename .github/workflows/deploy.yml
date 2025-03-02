@@ -22,11 +22,10 @@ jobs:
       
     steps:
     - uses: actions/checkout@v4
-
-    - name: Create .env file
-        run: |
-          echo "JWT_SECRET: ${{secrets.JWT_SECRET}}" >> .env
-          echo "MONGO_URL: ${{secrets.MONGO_URL}}" >> .env
+    - name: Deploy to VPS
+      run: |
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> .env
     
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
