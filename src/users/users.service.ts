@@ -1,0 +1,44 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { RegisterDto } from 'src/auth/dto/register.dto';
+import { User } from 'src/schemas/User.schema';
+
+
+@Injectable()
+export class UsersService {
+
+  constructor(
+    @InjectModel(User.name) private UsersModel: Model<User>
+  ){}
+
+  async create(RegisterDto: RegisterDto) {
+    const {fullName, phoneNumber, gender, dob} = RegisterDto;
+    return await this.UsersModel.create({
+      fullName,
+      phoneNumber,
+      gender,
+      dob
+    });
+  }
+
+  async findAll() {
+    return await this.UsersModel.find();
+  }
+
+  async findOne(id: string) {
+    const user = await this.UsersModel.findById(id);
+    if (!user) {
+      throw new BadRequestException("Not Found!")
+    }
+    return user;
+  }
+
+  // update(id: number, updateUserDto: UpdateUserDto) {
+  //   return `This action updates a #${id} user`;
+  // }
+
+  // remove(id: number) {
+  //   return `This action removes a #${id} user`;
+  // }
+}
