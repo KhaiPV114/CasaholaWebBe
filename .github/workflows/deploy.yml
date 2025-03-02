@@ -15,17 +15,16 @@ jobs:
       matrix:
         node-version: [22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-    env:
-      JWT_SECRET: ${{secrets.JWT_SECRET}}
-      MONGO_URL: ${{secrets.MONGO_URL}}
-      
+  
     steps:
     - uses: actions/checkout@v4
     - name: Deploy to VPS
       run: |
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> .env
+      env:
+        JWT_SECRET: ${{secrets.JWT_SECRET}}
+        MONGO_URL: ${{secrets.MONGO_URL}}
     
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
