@@ -22,9 +22,11 @@ jobs:
       run: |
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> .env
+          echo "PORT=${{ secrets.PORT }}" >> .env
       env:
         JWT_SECRET: ${{secrets.JWT_SECRET}}
         MONGO_URL: ${{secrets.MONGO_URL}}
+        PORT: ${{ secrets.PORT }}
     
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
