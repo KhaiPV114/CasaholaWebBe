@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
-import { nanoid } from 'nanoid';
+const { v4: uuidv4 } = require('uuid');
 import { AccountService } from 'src/account/account.service';
 import { Account, ResetPWToken } from 'src/schemas/Account.schema';
 import { User } from 'src/schemas/User.schema';
@@ -75,7 +75,7 @@ export class AuthService {
 
     const expires = new Date();
     expires.setHours(expires.getHours() + 1);
-    const token = nanoid(64);
+    const token = uuidv4();
 
     await this.resetPWToken.create({
       email,
@@ -83,6 +83,7 @@ export class AuthService {
       expires,
     });
 
+    console.log('token', token);
     return { message: 'If this user exists, they will receive an email' };
   }
 
