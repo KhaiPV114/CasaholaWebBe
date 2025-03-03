@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import config from './config/config';
 import { JwtModule } from '@nestjs/jwt';
+import { CriteriasModule } from './criterias/criterias.module';
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     AuthModule, 
     UsersModule, 
-    AccountModule],
+    AccountModule, CriteriasModule],
   controllers: [AppController],
   providers: [AppService],
 })

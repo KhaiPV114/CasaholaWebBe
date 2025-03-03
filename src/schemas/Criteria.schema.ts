@@ -3,50 +3,52 @@ import { Document, SchemaTypes, Types } from 'mongoose';
 
 @Schema({ collection: 'criterias' })
 export class Criteria extends Document {
-  @Prop({ required: true })
-  Purpose: string;
+  @Prop()
+  purpose: string;
 
   @Prop()
-  Budget: string;
+  budget: string;
 
   @Prop()
-  MoneyOpinion: string;
+  moneyOpinion: string;
 
   @Prop()
-  Habit: string;
+  habit: string;
 
   @Prop()
-  TimeActivate: string;
+  timeActivate: string;
 
   @Prop()
-  Hobby: string;
+  hobby: string;
 
   @Prop()
-  Hygiene: string;
+  hygiene: string;
 
   @Prop()
-  Outsider: string;
+  outsider: string;
 
   @Prop()
-  Pet: string;
+  pet: string;
 
   @Prop()
-  Smoking: string;
+  cooking: string;
 
   @Prop()
-  Cooking: string;
+  vehicle: string;
 
   @Prop()
-  Vehicle: string;
+  region: string;
 
   @Prop()
-  Region: string;
+  sharingWay: string;
 
-  @Prop()
-  SharingWay: string;
-
-  @Prop({ type: SchemaTypes.ObjectId, ref: 'User', required: true })
-  UserId: Types.ObjectId;
+  @Prop({
+    type: SchemaTypes.ObjectId,
+    ref: 'User',
+    required: true,
+    unique: true,
+  })
+  userId: Types.ObjectId;
 }
 
 export const CriteriaSchema = SchemaFactory.createForClass(Criteria);

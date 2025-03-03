@@ -1,17 +1,20 @@
-import { BadRequestException, Injectable, Type, UnauthorizedException } from '@nestjs/common';
-import { AccountService } from 'src/account/account.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Account, ResetPWToken } from 'src/schemas/Account.schema';
-import { Model, Types } from 'mongoose';
-import * as bcrypt from 'bcrypt'
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/schemas/User.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import * as bcrypt from 'bcrypt';
+import { Model } from 'mongoose';
 import { nanoid } from 'nanoid';
-import { ResetPWTokenDto } from './dto/resetPWToken.dto';
-import e from 'express';
+import { AccountService } from 'src/account/account.service';
+import { Account, ResetPWToken } from 'src/schemas/Account.schema';
+import { User } from 'src/schemas/User.schema';
 import { ChangePasswordDto } from './dto/changePassword.dto';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { ResetPWTokenDto } from './dto/resetPWToken.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,36 +23,36 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(ResetPWToken.name) private resetPWToken: Model<ResetPWToken>,
     private accountService: AccountService,
-    private jwtService: JwtService
-  ) { }
+    private jwtService: JwtService,
+  ) {}
 
   async register(registerDto: RegisterDto) {
-    return this.accountService.create(registerDto)
+    return this.accountService.create(registerDto);
   }
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
 
     const account = await this.accountModel.findOne({
-      email
+      email,
     });
 
     if (!account) {
-      throw new UnauthorizedException("Wrong");
+      throw new UnauthorizedException('Wrong');
     }
 
     const isCompare = await bcrypt.compare(password, account.password);
     if (!isCompare) {
-      throw new UnauthorizedException("Wrong");
+      throw new UnauthorizedException('Wrong');
     }
 
-    const user = await this.userModel.findById(account.userId)
+    const user = await this.userModel.findById(account.userId);
 
     if (!user) {
-      throw new UnauthorizedException("Wrong");
+      throw new UnauthorizedException('Wrong');
     }
     const { fullName, gender, dob, phoneNumber, _id } = user;
 
-    const token = await this.generateToken(_id)
+    const token = await this.generateToken(_id);
     return {
       id: _id,
       email,
@@ -57,75 +60,73 @@ export class AuthService {
       gender,
       dob,
       phoneNumber,
-      ...token
-    }
+      ...token,
+    };
   }
 
   async forgotPassword(email: string) {
     const account = await this.accountModel.findOne({
-      email
-    })
+      email,
+    });
 
     if (!account) {
-      return { message: "Not found email" }
+      return { message: 'Not found email' };
     }
 
     const expires = new Date();
     expires.setHours(expires.getHours() + 1);
-    const token = nanoid(64)
+    const token = nanoid(64);
 
     await this.resetPWToken.create({
       email,
       token,
-      expires
-    })
+      expires,
+    });
 
     return { message: 'If this user exists, they will receive an email' };
   }
 
-
   async resetPassword(resetPWToken: ResetPWTokenDto) {
-
     const { password, resetToken } = resetPWToken;
     const token = await this.resetPWToken.findOneAndDelete({
       token: resetToken,
-      expires: { $gte: new Date() }
-    })
+      expires: { $gte: new Date() },
+    });
 
     if (!token) {
       throw new UnauthorizedException('Invalid link');
     }
 
     const user = await this.accountModel.findOne({
-      email: token.email
-    })
+      email: token.email,
+    });
 
     if (!user) {
-      throw new BadRequestException("Not Found")
+      throw new BadRequestException('Not Found');
     }
 
     user.password = await bcrypt.hash(password, 10);
 
-    await user.save()
+    await user.save();
   }
 
   async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
-    const {newPassword, oldPassword} = changePasswordDto;
-    const account = await this.accountModel.findById(userId)
+    const { newPassword, oldPassword } = changePasswordDto;
+    const account = await this.accountModel.findById(userId);
 
     if (!account) {
-      throw new BadRequestException("Not Found")
+      throw new BadRequestException('Not Found');
     }
 
-    const isCompare = await bcrypt.compare(oldPassword, account.password)
+    const isCompare = await bcrypt.compare(oldPassword, account.password);
 
-    if(!isCompare) {
+    if (!isCompare) {
       throw new UnauthorizedException('Wrong');
     }
 
-    account.password = await bcrypt.hash(newPassword, 10)
+    account.password = await bcrypt.hash(newPassword, 10);
 
-    await account.save()
+    await account.save();
   }
 
   async refreshToken(refreshToken: string) {
@@ -134,21 +135,19 @@ export class AuthService {
 
     const user = await this.userModel.findById(userId);
     if (!user) {
-      throw new UnauthorizedException("Wrong")
+      throw new UnauthorizedException('Wrong');
     }
 
-    return { token: this.jwtService.sign({ userId }, { expiresIn: '10h' }) };
+    return { token: this.jwtService.sign({ userId }, { expiresIn: '30m' }) };
   }
 
   async generateToken(userId: any) {
-    const accessToken = this.jwtService.sign({ userId }, { expiresIn: '1m' });
+    const accessToken = this.jwtService.sign({ userId }, { expiresIn: '30m' });
     const refreshToken = this.jwtService.sign({ userId }, { expiresIn: '3w' });
 
     return {
       accessToken,
-      refreshToken
-    }
+      refreshToken,
+    };
   }
-
-
 }
