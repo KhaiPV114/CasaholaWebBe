@@ -12,11 +12,10 @@ export class AppController {
     return this.appService.getHello();
   }
 
-
   @Get('test')
   @UseGuards(AuthenticationGruad)
   @ApiBearerAuth()
   async getTest() {
-    return "Ok"
+    return 'Ok';
   }
 }
