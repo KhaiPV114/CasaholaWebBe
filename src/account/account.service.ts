@@ -6,6 +6,8 @@ import { RegisterDto } from 'src/auth/dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
 import { ResetPWTokenDto } from 'src/auth/dto/resetPWToken.dto';
+import { GoogleLoginDto } from './../auth/dto/googleLogin.dto';
+import { TokenPayload } from 'google-auth-library';
 
 @Injectable()
 export class AccountService {
@@ -16,7 +18,6 @@ export class AccountService {
   ) { }
 
   async create(registerDto: RegisterDto) {
-    console.log(registerDto)
     const { email, password } = registerDto;
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -36,6 +37,18 @@ export class AccountService {
       email,
       password: hashedPassword
     });
+  }
+
+  async createAccountGoogle(TokenPayload : TokenPayload){
+
+    const user = await this.userService.createGoogleUser(TokenPayload)
+
+    return this.AccountModel.create({
+      userId: user._id,
+      email: TokenPayload.email,
+      googleId: TokenPayload.sub,
+      isAuthGoogle: true
+    })
   }
 
   // findAll() {

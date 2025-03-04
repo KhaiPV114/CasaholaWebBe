@@ -26,10 +26,10 @@ export class CriteriasController {
     return this.criteriasService.create(criteriaDto, req.userId);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.criteriasService.findAll();
-  // }
+  @Get()
+  async findOne(@Req() req: any) {
+    return this.criteriasService.findOne(req.userId);
+  }
 
   @Post('/find-room-match')
   async findRoomMatch(@Body() RoomMatchDto: RoomMatchDto) {

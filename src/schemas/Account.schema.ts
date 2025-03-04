@@ -65,9 +65,6 @@ export class Account extends Document{
   @Prop({ type: ActivationSchema, default: null })
   activation?: Activation;
 
-  // @Prop({ type: ResetPWTokenSchema, default: null })
-  // resetPWToken?: ResetPWToken;
-
   @Prop({ type: Boolean, default: false, required: true})
   isAuthGoogle: boolean;
 }

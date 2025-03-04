@@ -3,11 +3,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
+import { OAuth2Client, TokenPayload } from 'google-auth-library';
 import { Model } from 'mongoose';
-const { v4: uuidv4 } = require('uuid');
 import { AccountService } from 'src/account/account.service';
 import { Account, ResetPWToken } from 'src/schemas/Account.schema';
 import { User } from 'src/schemas/User.schema';
@@ -15,20 +16,26 @@ import { ChangePasswordDto } from './dto/changePassword.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPWTokenDto } from './dto/resetPWToken.dto';
+const { v4: uuidv4 } = require('uuid');
 
 @Injectable()
 export class AuthService {
+  private client: OAuth2Client;
   constructor(
     @InjectModel(Account.name) private accountModel: Model<Account>,
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(ResetPWToken.name) private resetPWToken: Model<ResetPWToken>,
+    private configService: ConfigService,
     private accountService: AccountService,
     private jwtService: JwtService,
-  ) {}
+  ) {
+    this.client = new OAuth2Client(this.configService.get('google.id'));
+  }
 
   async register(registerDto: RegisterDto) {
     return this.accountService.create(registerDto);
   }
+
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
 
@@ -83,7 +90,6 @@ export class AuthService {
       expires,
     });
 
-    console.log('token', token);
     return { message: 'If this user exists, they will receive an email' };
   }
 
@@ -150,5 +156,49 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async verifyGoogleLogin(token: string) {
+    try {
+      const ticket = await this.client.verifyIdToken({
+        idToken: token,
+        audience: this.configService.get('google.id'),
+      });
+
+      const payload = ticket.getPayload();
+
+      const { email } = payload as TokenPayload;
+
+      let account = await this.accountModel.findOne({
+        email,
+      });
+      
+      if (!account) {
+        account = await this.accountService.createAccountGoogle(
+          payload as TokenPayload,
+        );
+      }
+
+      const user = await this.userModel.findById(account.userId);
+
+      if (!user) {
+        throw new UnauthorizedException('Wrong');
+      }
+      
+      const { fullName, gender, dob, phoneNumber, _id } = user;
+
+      const generateToken = await this.generateToken(_id);
+      return {
+        id: _id,
+        email,
+        fullName,
+        gender,
+        dob,
+        phoneNumber,
+        ...generateToken,
+      };
+    } catch (e) {
+      throw new UnauthorizedException('Google Login Eror!');
+    }
   }
 }

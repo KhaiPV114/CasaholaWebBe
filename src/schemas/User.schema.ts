@@ -15,14 +15,14 @@ export class User extends Document {
   @Prop({ required: true, default: ROLES.USER })
   role?: string;
 
-  @Prop({ required: true })
-  phoneNumber: string;
+  @Prop({ required: false, default: '' })
+  phoneNumber?: string;
 
-  @Prop({ required: true })
-  dob: Date;
+  @Prop({ required: false, default: '' })
+  dob?: Date;
 
-  @Prop({ required: true })
-  gender: string;
+  @Prop({ required: false, default: '' })
+  gender?: string;
 
   @Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'Package' }] })
   packageId?: Types.ObjectId[];

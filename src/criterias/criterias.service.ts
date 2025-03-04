@@ -18,9 +18,18 @@ export class CriteriasService {
       ...criteriaDto,
     });
   }
-  // findAll() {
-  //   return `This action returns all criterias`;
-  // }
+ 
+  async findOne(userId: Types.ObjectId) {
+    const criteria = await this.CriteriaModel.findOne({
+      userId
+    })
+
+    if (!criteria) {
+      return {criteria : null}
+    }
+
+    return criteria;
+  }
 
   async findRoomMatch(RoomMatchDto: RoomMatchDto) {
     const criteria = await this.CriteriaModel.find({

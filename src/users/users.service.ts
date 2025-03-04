@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { RegisterDto } from 'src/auth/dto/register.dto';
 import { User } from 'src/schemas/User.schema';
+import { GoogleLoginDto } from './../auth/dto/googleLogin.dto';
+import { TokenPayload } from 'google-auth-library';
 
 
 @Injectable()
@@ -12,13 +14,21 @@ export class UsersService {
     @InjectModel(User.name) private UsersModel: Model<User>
   ){}
 
-  async create(RegisterDto: RegisterDto) {
+  async create(RegisterDto: RegisterDto ) {
     const {fullName, phoneNumber, gender, dob} = RegisterDto;
     return await this.UsersModel.create({
       fullName,
       phoneNumber,
       gender,
       dob
+    });
+  }
+
+  async createGoogleUser(TokenPayload: TokenPayload) {
+    const {name, picture} = TokenPayload;
+    return await this.UsersModel.create({
+      fullName: name,
+      profileImage: picture
     });
   }
 

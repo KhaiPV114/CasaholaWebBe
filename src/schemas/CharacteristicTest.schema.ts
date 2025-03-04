@@ -4,19 +4,19 @@ import { Document, SchemaTypes, Types } from 'mongoose';
 @Schema({ collection: 'characteristicTests' })
 export class CharacteristicTest extends Document {
   @Prop({ required: true })
-  TestId: number;
+  testId: number;
 
   @Prop({ required: true })
-  Date: Date;
+  date: Date;
 
   @Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'Question' }] })
-  Question: Types.ObjectId[];
+  question: Types.ObjectId[];
 
   @Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'Answer' }] })
-  Answers: Types.ObjectId[];
+  answers: Types.ObjectId[];
 
   @Prop({ type: SchemaTypes.ObjectId, ref: 'User', required: true })
-  UserId: Types.ObjectId;
+  userId: Types.ObjectId;
 }
 
 export const CharacteristicTestSchema = SchemaFactory.createForClass(CharacteristicTest);

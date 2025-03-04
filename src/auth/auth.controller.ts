@@ -7,6 +7,7 @@ import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPWTokenDto } from './dto/resetPWToken.dto';
 import { AuthenticationGruad } from 'src/gruads/authentication.gruad';
+import { GoogleLoginDto } from './dto/googleLogin.dto';
 
 
 @Controller('auth')
@@ -24,8 +25,8 @@ export class AuthController {
   }
 
   @Post('login/google')
-  async loginGoogle() {
-
+  async loginGoogle(@Body() googleLoginDto : GoogleLoginDto) {
+    return this.authService.verifyGoogleLogin(googleLoginDto.token)
   }
 
   @Post('refresh-token')

@@ -5,5 +5,8 @@ export default () => ({
     database: {
       connectionString: process.env.MONGO_URL,
     },
+    google: {
+      id: process.env.GOOGLE_CLIENT_ID
+    }
   });
   
