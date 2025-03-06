@@ -13,26 +13,26 @@ export class CriteriasService {
   ) {}
 
   async create(criteriaDto: CriteriaDto, userId: Types.ObjectId) {
-    console.log(criteriaDto)
     await this.CriteriaModel.create({
       userId: userId,
       ...criteriaDto,
     });
   }
- 
+
   async findOne(userId: Types.ObjectId) {
     const criteria = await this.CriteriaModel.findOne({
-      userId
-    })
+      userId,
+    });
 
     if (!criteria) {
-      return {criteria : null}
+      return { criteria: null };
     }
 
-    return {criteria};
+    return { criteria };
   }
 
   async findRoomMatch(RoomMatchDto: RoomMatchDto) {
+    console.log(RoomMatchDto);
     const criteria = await this.CriteriaModel.find({
       ...RoomMatchDto,
     });

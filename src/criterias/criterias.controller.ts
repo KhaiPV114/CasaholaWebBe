@@ -23,7 +23,7 @@ export class CriteriasController {
 
   @Post()
   async create(@Body() criteriaDto: CriteriaDto, @Req() req: any) {
-    console.log(criteriaDto)
+    console.log(criteriaDto);
     return this.criteriasService.create(criteriaDto, req.userId);
   }
 
@@ -32,7 +32,7 @@ export class CriteriasController {
     return this.criteriasService.findOne(req.userId);
   }
 
-  @Post('/find-room-match')
+  @Put('/find-room-match')
   async findRoomMatch(@Body() RoomMatchDto: RoomMatchDto) {
     return this.criteriasService.findRoomMatch(RoomMatchDto);
   }

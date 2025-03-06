@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import config from './config/config';
 import { JwtModule } from '@nestjs/jwt';
 import { CriteriasModule } from './criterias/criterias.module';
+import { VnpayModule } from './vnpay/vnpay.module';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { CriteriasModule } from './criterias/criterias.module';
     }),
     AuthModule, 
     UsersModule, 
-    AccountModule, CriteriasModule],
+    AccountModule, CriteriasModule, VnpayModule],
   controllers: [AppController],
   providers: [AppService],
 })

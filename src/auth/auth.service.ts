@@ -10,8 +10,9 @@ import * as bcrypt from 'bcrypt';
 import { OAuth2Client, TokenPayload } from 'google-auth-library';
 import { Model } from 'mongoose';
 import { AccountService } from 'src/account/account.service';
-import { Account, ResetPWToken } from 'src/schemas/Account.schema';
+import { ResetPWToken } from 'src/schemas/Account.schema';
 import { User } from 'src/schemas/User.schema';
+import { Account } from './../schemas/Account.schema';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -61,7 +62,7 @@ export class AuthService {
 
     const token = await this.generateToken(_id);
     return {
-      user : {
+      user: {
         id: _id,
         email,
         fullName,
@@ -174,7 +175,7 @@ export class AuthService {
       let account = await this.accountModel.findOne({
         email,
       });
-      
+
       if (!account) {
         account = await this.accountService.createAccountGoogle(
           payload as TokenPayload,
@@ -186,7 +187,7 @@ export class AuthService {
       if (!user) {
         throw new UnauthorizedException('Wrong');
       }
-      
+
       const { fullName, gender, dob, phoneNumber, _id } = user;
 
       const generateToken = await this.generateToken(_id);
@@ -202,5 +203,36 @@ export class AuthService {
     } catch (e) {
       throw new UnauthorizedException('Google Login Eror!');
     }
+  }
+
+  async accountRemember(accessToken: string) {
+    const token = this.jwtService.verify(accessToken);
+    const { userId } = token;
+
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('Wrong');
+    }
+    const { fullName, gender, dob, phoneNumber, _id } = user;
+
+    const account = await this.accountModel.findOne({
+      userId: _id,
+    });
+    if (!account) {
+      throw new UnauthorizedException('Wrong');
+    }
+    const remember = await this.generateToken(_id);
+
+    return {
+      user: {
+        id: _id,
+        email: account.email,
+        fullName,
+        gender,
+        dob,
+        phoneNumber,
+      },
+      ...remember,
+    };
   }
 }

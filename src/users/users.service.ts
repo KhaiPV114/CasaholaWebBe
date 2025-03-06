@@ -6,29 +6,25 @@ import { User } from 'src/schemas/User.schema';
 import { GoogleLoginDto } from './../auth/dto/googleLogin.dto';
 import { TokenPayload } from 'google-auth-library';
 
-
 @Injectable()
 export class UsersService {
+  constructor(@InjectModel(User.name) private UsersModel: Model<User>) {}
 
-  constructor(
-    @InjectModel(User.name) private UsersModel: Model<User>
-  ){}
-
-  async create(RegisterDto: RegisterDto ) {
-    const {fullName, phoneNumber, gender, dob} = RegisterDto;
+  async create(RegisterDto: RegisterDto) {
+    const { fullName, phoneNumber, gender, dob } = RegisterDto;
     return await this.UsersModel.create({
       fullName,
       phoneNumber,
       gender,
-      dob
+      dob,
     });
   }
 
   async createGoogleUser(TokenPayload: TokenPayload) {
-    const {name, picture} = TokenPayload;
+    const { name, picture } = TokenPayload;
     return await this.UsersModel.create({
       fullName: name,
-      profileImage: picture
+      profileImage: picture,
     });
   }
 
@@ -39,9 +35,19 @@ export class UsersService {
   async findOne(id: string) {
     const user = await this.UsersModel.findById(id);
     if (!user) {
-      throw new BadRequestException("Not Found!")
+      throw new BadRequestException('Not Found!');
     }
     return user;
+  }
+
+  async checkPackage(id: string) {
+    const user = await this.UsersModel.findById(id);
+    if (!user) {
+      throw new BadRequestException('Not Found!');
+    }
+    return {
+      package: user.packageId,
+    };
   }
 
   // update(id: number, updateUserDto: UpdateUserDto) {
