@@ -61,12 +61,14 @@ export class AuthService {
 
     const token = await this.generateToken(_id);
     return {
-      id: _id,
-      email,
-      fullName,
-      gender,
-      dob,
-      phoneNumber,
+      user : {
+        id: _id,
+        email,
+        fullName,
+        gender,
+        dob,
+        phoneNumber,
+      },
       ...token,
     };
   }

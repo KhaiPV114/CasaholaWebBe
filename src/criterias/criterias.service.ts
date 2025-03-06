@@ -13,6 +13,7 @@ export class CriteriasService {
   ) {}
 
   async create(criteriaDto: CriteriaDto, userId: Types.ObjectId) {
+    console.log(criteriaDto)
     await this.CriteriaModel.create({
       userId: userId,
       ...criteriaDto,
@@ -28,7 +29,7 @@ export class CriteriasService {
       return {criteria : null}
     }
 
-    return criteria;
+    return {criteria};
   }
 
   async findRoomMatch(RoomMatchDto: RoomMatchDto) {

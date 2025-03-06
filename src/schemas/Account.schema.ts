@@ -53,7 +53,7 @@ export class Account extends Document{
   @Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'User' })
   userId: Types.ObjectId;
 
-  @Prop({ unique: true })
+  @Prop({default: ''})
   googleId?: string;
 
   @Prop({ type: StatusSchema, default: { isBlocked: true, reasonBlock: '' } })

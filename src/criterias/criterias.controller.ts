@@ -23,6 +23,7 @@ export class CriteriasController {
 
   @Post()
   async create(@Body() criteriaDto: CriteriaDto, @Req() req: any) {
+    console.log(criteriaDto)
     return this.criteriasService.create(criteriaDto, req.userId);
   }
 
