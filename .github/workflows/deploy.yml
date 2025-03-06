@@ -22,6 +22,10 @@ jobs:
       run: |
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> .env
+          echo "VNP_TMN_CODE=${{ secrets.VNP_TMN_CODE }}" >> .env
+          echo "VNP_HASH_SECRET=${{ secrets.VNP_HASH_SECRET }}" >> .env
+          echo "VNP_URL=${{ secrets.VNP_URL }}" >> .env
+          echo "VNP_RETURN_URL=${{ secrets.VNP_RETURN_URL }}" >> .env
           echo "PORT=${{ secrets.PORT }}" >> .env
       env:
         JWT_SECRET: ${{secrets.JWT_SECRET}}
