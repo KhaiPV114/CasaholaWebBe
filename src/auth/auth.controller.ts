@@ -1,4 +1,14 @@
-import { Body, Controller, Post, Put, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
@@ -37,7 +47,7 @@ export class AuthController {
   @Post('forgot-password')
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     const { email } = forgotPasswordDto;
-    return this.authService.forgotPassword(email);
+    await this.authService.forgotPassword(email);
   }
 
   @Put('change-password')
@@ -51,11 +61,26 @@ export class AuthController {
 
   @Put('reset-password')
   async resetPassword(@Body() resetPasswordDto: ResetPWTokenDto) {
-    this.authService.resetPassword(resetPasswordDto);
+    try {
+      console.log(resetPasswordDto)
+      await this.authService.resetPassword(resetPasswordDto);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   @Post('account-remember')
   async accountRemember(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.accountRemember(refreshTokenDto.token);
+  }
+
+  @Get('check-reset-password')
+  async checkResetPassword(@Query('token') token: string) {
+    try {
+      return await this.authService.checkResetPassword(token);
+    } catch (error) {
+      return false;
+    }
   }
 }

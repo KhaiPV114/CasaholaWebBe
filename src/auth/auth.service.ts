@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -17,6 +18,7 @@ import { ChangePasswordDto } from './dto/changePassword.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPWTokenDto } from './dto/resetPWToken.dto';
+import { MailService } from '../mail/mail.service';
 const { v4: uuidv4 } = require('uuid');
 
 @Injectable()
@@ -29,6 +31,7 @@ export class AuthService {
     private configService: ConfigService,
     private accountService: AccountService,
     private jwtService: JwtService,
+    private mailService: MailService,
   ) {
     this.client = new OAuth2Client(this.configService.get('google.id'));
   }
@@ -80,7 +83,7 @@ export class AuthService {
     });
 
     if (!account) {
-      return { message: 'Not found email' };
+      throw new BadRequestException('Email khong ton tai');
     }
 
     const expires = new Date();
@@ -93,7 +96,7 @@ export class AuthService {
       expires,
     });
 
-    return { message: 'If this user exists, they will receive an email' };
+    this.mailService.sendPasswordResetEmail(email, token);
   }
 
   async resetPassword(resetPWToken: ResetPWTokenDto) {
@@ -234,5 +237,18 @@ export class AuthService {
       },
       ...remember,
     };
+  }
+
+  async checkResetPassword(token: string) {
+    const reset = await this.resetPWToken.findOne({
+      token: token,
+      expires: { $gte: new Date() },
+    });
+
+    console.log(token, reset)
+    if (!reset) {
+      return false;
+    }
+    return true;
   }
 }

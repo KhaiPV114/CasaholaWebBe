@@ -7,11 +7,20 @@ export default () => ({
   },
   google: {
     id: process.env.GOOGLE_CLIENT_ID,
+    sercet: process.env.GOOGLE_CLIENT_SECRET
   },
   vpn: {
-    tmnCode: process.env.VNP_TMN_CODE,
-    hashSecret: process.env.VNP_HASH_SECRET,
-    vnpUrl: process.env.VNP_URL,
-    returnUrl: process.env.VNP_RETURN_URL,
+    tmnCode: process.env.VPN_TMN_CODE,
+    hashSecret: process.env.VPN_HASH_SECRET,
+    vnpUrl: process.env.VPN_URL,
+    returnUrl: process.env.VPN_RETURN_URL,
   },
+  gmail: {
+    user: process.env.GMAIL_USERNAME,
+    sercet: process.env.GMAIL_PASSWORD,
+    host: process.env.GMAIL_HOST
+  },
+  fe: {
+    url: process.env.FE_BASE_URL
+  }
 });

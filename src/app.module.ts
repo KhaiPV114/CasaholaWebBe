@@ -10,6 +10,10 @@ import config from './config/config';
 import { JwtModule } from '@nestjs/jwt';
 import { CriteriasModule } from './criterias/criterias.module';
 import { VnpayModule } from './vnpay/vnpay.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { join } from 'path';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { strict } from 'assert';
 
 @Module({
   imports: [
@@ -21,10 +25,10 @@ import { VnpayModule } from './vnpay/vnpay.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (config) => ({
-        secret: config.get('jwt.secret')
+        secret: config.get('jwt.secret'),
       }),
       global: true,
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -33,9 +37,37 @@ import { VnpayModule } from './vnpay/vnpay.module';
       }),
       inject: [ConfigService],
     }),
-    AuthModule, 
-    UsersModule, 
-    AccountModule, CriteriasModule, VnpayModule],
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (config) => ({
+        transport: {
+          host: config.get('gmail.host'),
+          secure: true,
+          port: 465,
+          auth: {
+            user: config.get('gmail.user'),
+            pass: config.get('gmail.sercet'),
+          }
+        },
+        defaults: {
+          from: '"No Reply" casahola.contact@gmail.com',
+        },
+        template: {
+          dir: join(__dirname, 'mail/templates'),
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    AuthModule,
+    UsersModule,
+    AccountModule,
+    CriteriasModule,
+    VnpayModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
