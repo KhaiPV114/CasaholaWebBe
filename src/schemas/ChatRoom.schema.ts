@@ -3,17 +3,24 @@ import { Document, SchemaTypes, Types } from 'mongoose';
 
 @Schema({ collection: 'chatRooms' })
 export class ChatRoom extends Document {
-  @Prop({ type: SchemaTypes.ObjectId, auto: true })
-  RoomId: Types.ObjectId;
 
-  @Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'Users' }] })
-  UserId: Types.ObjectId[];
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'Users' })
+  sendUid: Types.ObjectId;
+
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'Users' })
+  receiveUid: Types.ObjectId;
 
   @Prop({ required: true })
-  SendContent: string;
+  message: string;
 
   @Prop({ default: Date.now })
-  SendTime: Date;
+  sendTime: Date;
+
+  @Prop({required: false})
+  file?: string;
+
+  @Prop({default: false})
+  status: boolean;
 }
 
 export const ChatRoomSchema = SchemaFactory.createForClass(ChatRoom);

@@ -31,10 +31,10 @@ export class CriteriasService {
     return { criteria };
   }
 
-  async findRoomMatch(RoomMatchDto: RoomMatchDto) {
-    console.log(RoomMatchDto);
+  async findRoomMatch(RoomMatchDto: RoomMatchDto, userId : Types.ObjectId) {
     const criteria = await this.CriteriaModel.find({
       ...RoomMatchDto,
+      userId: {$ne: userId}
     });
 
     if (!criteria) {
@@ -42,7 +42,6 @@ export class CriteriasService {
     }
 
     const userIds = criteria.map((c) => c.userId);
-
     const users = await this.UserModel.find({
       _id: { $in: userIds },
     }).select('-packageId -createdAt -updatedAt');

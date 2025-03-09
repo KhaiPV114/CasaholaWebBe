@@ -1,7 +1,11 @@
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Injectable } from '@nestjs/common';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import * as crypto from 'crypto';
+import { Connection, Model, Types } from 'mongoose';
 import * as qs from 'qs';
+import { Package } from 'src/schemas/Package.schema';
+import { User } from 'src/schemas/User.schema';
 
 @Injectable()
 export class VnpayService {
@@ -9,8 +13,16 @@ export class VnpayService {
   private hashSecret: string;
   private vnpUrl: string;
   private returnUrl: string;
+  private PACKAGE_TYPE = {
+    35000: 'GOLD',
+    50000: 'PLATINUM',
+  };
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    @InjectModel(Package.name) private packageModel: Model<Package>,
+    @InjectModel(User.name) private userModel: Model<User>,
+    private configService: ConfigService,
+  ) {
     this.tmnCode = this.configService.get('vpn.tmnCode') || '';
     this.hashSecret = this.configService.get('vpn.hashSecret') || '';
     this.vnpUrl = this.configService.get('vpn.vnpUrl') || '';
@@ -18,15 +30,20 @@ export class VnpayService {
   }
 
   // Tạo URL thanh toán VNPAY
-  generatePaymentUrl(
-    // orderInfo: string,
+  async generatePaymentUrl(
+    userId: Types.ObjectId,
     amount: number,
     orderId: string,
-  ): string {
+  ): Promise<string> {
     const currCode = 'VND';
     const date = new Date();
-
     const createDate = this.formatDate(date);
+    const endDate = date.setMonth(date.getMonth() + 1);
+    const packages = await this.packageModel.create({
+      price: amount,
+      userId: userId,
+      endDate: endDate,
+    });
 
     const vnp_Params: Record<string, string | number> = {};
     vnp_Params['vnp_Version'] = '2.1.0';
@@ -34,7 +51,7 @@ export class VnpayService {
     vnp_Params['vnp_TmnCode'] = this.tmnCode;
     vnp_Params['vnp_Locale'] = 'vn';
     vnp_Params['vnp_CurrCode'] = currCode;
-    vnp_Params['vnp_TxnRef'] = this.generateTransactionNo();
+    vnp_Params['vnp_TxnRef'] = (packages._id as Types.ObjectId).toString();
     vnp_Params['vnp_OrderInfo'] = orderId;
     vnp_Params['vnp_OrderType'] = '250000';
     vnp_Params['vnp_Amount'] = amount * 100;
@@ -53,10 +70,6 @@ export class VnpayService {
       this.vnpUrl + '?' + qs.stringify(vnp_Params, { encode: true });
 
     return vnpUrl;
-  }
-
-  private generateTransactionNo(): string {
-    return Math.floor(Math.random() * 1000000000).toString();
   }
 
   private formatDate(date: Date): string {
@@ -80,24 +93,38 @@ export class VnpayService {
   }
 
   async handleCallback(queryParams: any) {
-    const secureHash = queryParams['vnp_SecureHash'];
-    delete queryParams['vnp_SecureHash'];
-    delete queryParams['vnp_SecureHashType'];
+      const secureHash = queryParams['vnp_SecureHash'];
+      delete queryParams['vnp_SecureHash'];
+      delete queryParams['vnp_SecureHashType'];
+      const sortedParams = this.sortObject(queryParams);
+      const signData = qs.stringify(sortedParams, { encode: true });
+      const hmac = crypto.createHmac('sha512', this.hashSecret);
+      const signed = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
+      const vnp_TxnRef = queryParams['vnp_TxnRef'];
+      const packages = await this.packageModel.findById(vnp_TxnRef);
 
-    const sortedParams = this.sortObject(queryParams);
+      if (!packages) {
+        throw new InternalServerErrorException("Not found package");
+      }
 
-    const signData = qs.stringify(sortedParams, { encode: true });
-    const hmac = crypto.createHmac('sha512', this.hashSecret);
-    const signed = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
-
-    if (signed === secureHash) {
-      return {
-        status: 'success',
-        message: 'Payment success',
-        data: queryParams,
-      };
-    } else {
-      return { status: 'failed', message: 'Invalid signature' };
-    }
+      if (signed === secureHash) {
+        packages.status = 'SUCCESS';
+        await packages.save();
+        const user = await this.userModel.findById(packages.userId);
+        if (!user) {
+          throw new InternalServerErrorException('Not found user');
+        }
+        user.packageType = this.PACKAGE_TYPE[packages.price];
+        await user.save();
+        return {
+          status: 'success',
+          message: 'Thanh toán thành công',
+          data: queryParams,
+        };
+      } else {
+        packages.status = 'FAIL';
+        await packages.save();
+        return { status: 'error', message: 'Thanh toán thất bại' };
+      }
   }
 }

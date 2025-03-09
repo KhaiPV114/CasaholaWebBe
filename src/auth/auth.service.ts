@@ -61,7 +61,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Wrong');
     }
-    const { fullName, gender, dob, phoneNumber, _id } = user;
+    const { fullName, gender, dob, phoneNumber, packageType, _id } = user;
 
     const token = await this.generateToken(_id);
     return {
@@ -72,6 +72,7 @@ export class AuthService {
         gender,
         dob,
         phoneNumber,
+        packageType,
       },
       ...token,
     };
@@ -216,7 +217,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Wrong');
     }
-    const { fullName, gender, dob, phoneNumber, _id } = user;
+    const { fullName, gender, dob, phoneNumber, _id, packageType } = user;
 
     const account = await this.accountModel.findOne({
       userId: _id,
@@ -234,6 +235,7 @@ export class AuthService {
         gender,
         dob,
         phoneNumber,
+        packageType
       },
       ...remember,
     };
@@ -245,7 +247,7 @@ export class AuthService {
       expires: { $gte: new Date() },
     });
 
-    console.log(token, reset)
+    console.log(token, reset);
     if (!reset) {
       return false;
     }

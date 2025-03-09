@@ -14,6 +14,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { strict } from 'assert';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { strict } from 'assert';
     AccountModule,
     CriteriasModule,
     VnpayModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

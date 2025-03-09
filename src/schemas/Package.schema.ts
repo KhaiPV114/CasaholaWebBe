@@ -3,17 +3,20 @@ import { Document, SchemaTypes, Types } from 'mongoose';
 
 @Schema({ collection: 'packages' })
 export class Package extends Document {
-  @Prop({ type: SchemaTypes.ObjectId, auto: true })
-  PackageId: Types.ObjectId;
-
   @Prop({ required: true })
-  Price: number;
+  price: number;
 
-  @Prop({ required: true })
-  Duration: number;
+  @Prop({ required: false })
+  duration?: number;
 
-  @Prop({ required: true })
-  Level: number;
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'User' , required: true} )
+  userId: Types.ObjectId;
+
+  @Prop({ required: true, default: 'PENDING' })
+  status: 'PENDING' | 'SUCCESS' | 'FAIL';
+
+  @Prop({ required: true})
+  endDate: Date
 }
 
 export const PackageSchema = SchemaFactory.createForClass(Package);

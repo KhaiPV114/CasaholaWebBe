@@ -40,15 +40,15 @@ export class UsersService {
     return user;
   }
 
-  async checkPackage(id: string) {
-    const user = await this.UsersModel.findById(id);
-    if (!user) {
-      throw new BadRequestException('Not Found!');
-    }
-    return {
-      package: user.packageId,
-    };
-  }
+  // async checkPackage(id: string) {
+  //   const user = await this.UsersModel.findById(id);
+  //   if (!user) {
+  //     throw new BadRequestException('Not Found!');
+  //   }
+  //   return {
+  //     package: user.packageId,
+  //   };
+  // }
 
   // update(id: number, updateUserDto: UpdateUserDto) {
   //   return `This action updates a #${id} user`;

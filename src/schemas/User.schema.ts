@@ -24,13 +24,13 @@ export class User extends Document {
   @Prop({ required: false, default: '' })
   gender?: string;
 
-  @Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'Package' }] })
-  packageId?: Types.ObjectId[];
+  @Prop({default: 'NONE'})
+  packageType?: 'NONE' | 'GOLD' | 'PLATINUM';
 
   @Prop({ required: false })
   identificationImage?: string;
 
-  @Prop({ required: false })
+  @Prop({ required: false , default: ''})
   profileImage?: string;
 }
 

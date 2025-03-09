@@ -1,17 +1,9 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Req,
-  InternalServerErrorException,
-  UseGuards,
+  Param
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { AuthenticationGruad } from 'src/gruads/authentication.gruad';
 
 @Controller('users')
 export class UsersController {
@@ -32,15 +24,15 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Get('check-package/:id')
-  @UseGuards(AuthenticationGruad)
-  async checkPackage(@Param('id') id: string, @Req() req: any) {
-    if (id !== req.userId) {
-      throw new InternalServerErrorException();
-    }
+  // @Get('check-package/:id')
+  // @UseGuards(AuthenticationGruad)
+  // async checkPackage(@Param('id') id: string, @Req() req: any) {
+  //   if (id !== req.userId) {
+  //     throw new InternalServerErrorException();
+  //   }
 
-    return this.usersService.checkPackage(id);
-  }
+  //   return this.usersService.checkPackage(id);
+  // }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
