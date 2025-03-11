@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { VnpayService } from './vnpay.service';
-import { VnpayController } from './vnpay.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Package, PackageSchema } from 'src/schemas/Package.schema';
 import { User, UserSchema } from 'src/schemas/User.schema';
-import { UsersService } from 'src/users/users.service';
+import { VnpayController } from './vnpay.controller';
+import { VnpayService } from './vnpay.service';
 
 @Module({
   imports: [

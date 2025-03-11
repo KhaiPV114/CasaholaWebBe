@@ -17,6 +17,9 @@ export class Package extends Document {
 
   @Prop({ required: true})
   endDate: Date
+
+  @Prop({unique: true})
+  orderId: string
 }
 
 export const PackageSchema = SchemaFactory.createForClass(Package);

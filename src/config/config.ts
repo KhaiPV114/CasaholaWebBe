@@ -7,7 +7,7 @@ export default () => ({
   },
   google: {
     id: process.env.GOOGLE_CLIENT_ID,
-    sercet: process.env.GOOGLE_CLIENT_SECRET
+    sercet: process.env.GOOGLE_CLIENT_SECRET,
   },
   vpn: {
     tmnCode: process.env.VPN_TMN_CODE,
@@ -18,9 +18,14 @@ export default () => ({
   gmail: {
     user: process.env.GMAIL_USERNAME,
     sercet: process.env.GMAIL_PASSWORD,
-    host: process.env.GMAIL_HOST
+    host: process.env.GMAIL_HOST,
   },
   fe: {
-    url: process.env.FE_BASE_URL
-  }
+    url: process.env.FE_BASE_URL,
+  },
+  payos: {
+    id: process.env.PAYOS_CLIENT_ID,
+    apiKey: process.env.PAYOS_API_KEY,
+    checksumKey: process.env.PAYOS_CHECKSUM_KEY,
+  },
 });
