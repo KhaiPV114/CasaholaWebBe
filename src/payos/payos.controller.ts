@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { PayOSService } from './payos.service';
 import { AuthenticationGruad } from 'src/gruads/authentication.gruad';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('payos')
 export class PayOSController {
@@ -8,6 +9,7 @@ export class PayOSController {
 
   @Get('create-payment')
   @UseGuards(AuthenticationGruad)
+  @ApiBearerAuth()
   async createPayment(
     @Query('orderId') orderId: string,
     @Query('amount') amount: number,
