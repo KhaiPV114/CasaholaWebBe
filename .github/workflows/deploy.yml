@@ -26,6 +26,9 @@ jobs:
           echo "VNP_HASH_SECRET=${{ secrets.VNP_HASH_SECRET }}" >> .env
           echo "VNP_URL=${{ secrets.VNP_URL }}" >> .env
           echo "VNP_RETURN_URL=${{ secrets.VNP_RETURN_URL }}" >> .env
+          echo "PAYOS_CLIENT_ID=${{ secrets.PAYOS_CLIENT_ID }}" >> .env
+          echo "PAYOS_API_KEY=${{ secrets.PAYOS_API_KEY }}" >> .env
+          echo "PAYOS_CHECKSUM_KEY=${{ secrets.PAYOS_CHECKSUM_KEY }}" >> .env
           echo "PORT=${{ secrets.PORT }}" >> .env
       env:
         JWT_SECRET: ${{secrets.JWT_SECRET}}
