@@ -1,6 +1,7 @@
+import { Status } from './../schemas/Account.schema';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { ChatRoom } from 'src/schemas/ChatRoom.schema';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
@@ -31,13 +32,37 @@ export class ChatService {
       .sort({ timestamp: 1 });
   }
 
-  async findDistinctReceivers(sendUid: string) {
-    const userId = await this.chatModel.distinct('receiveUid', {
+  async findDistinctReceivers(sendUid: string, chooseUid?: Types.ObjectId) {
+    const userIds = await this.chatModel.distinct('receiveUid', {
       sendUid: sendUid,
     });
 
+    const userId = await this.chatModel.distinct('sendUid', {
+      receiveUid: sendUid,
+    });
+
+    const allUserIds = [...userIds, ...userId];
+
+    const uniqueUserIds = [...new Set(allUserIds)];
+    if (chooseUid) {
+      uniqueUserIds.push(chooseUid);
+    }
+
+    // const chats = await this.chatModel
+    //   .find({
+    //     $or: [
+    //       { sendUid: new Types.ObjectId(sendUid) },
+    //       { receiveUid: new Types.ObjectId(sendUid) },
+    //     ],
+    //   })
+    //   .sort({ sendTime: -1 })
+    //   .distinct('receiveUid')
+    //   .exec();
+
+    // console.log(chats);
+
     return this.userModel.find({
-      _id: { $in: userId },
+      _id: { $in: uniqueUserIds },
     });
   }
 

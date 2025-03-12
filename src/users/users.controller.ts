@@ -1,27 +1,32 @@
-import {
-  Controller,
-  Get,
-  Param
-} from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { AuthenticationGruad } from 'src/gruads/authentication.gruad';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
+@UseGuards(AuthenticationGruad)
+@ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // @Post()
-  // create(@Body() createUserDto: CreateUserDto) {
-  //   return this.usersService.create(createUserDto);
-  // }
-
   @Get()
   async findAll() {
-    return this.usersService.findAll();
+    return await this.usersService.findAll();
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+    return await this.usersService.findOne(id);
+  }
+
+  @Get('likes/:id')
+  async getUserLikes(@Param('id') id: string) {
+    return await this.usersService.getUserLikes(id);
+  }
+
+  @Get('matchs/:id')
+  async getUserMatchs(@Param('id') id: string) {
+    return await this.usersService.getUserMatchs(id);
   }
 
   // @Get('check-package/:id')

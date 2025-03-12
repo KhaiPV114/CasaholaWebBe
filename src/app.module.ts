@@ -15,6 +15,7 @@ import { CriteriasModule } from './criterias/criterias.module';
 import { PayOSModule } from './payos/payos.module';
 import { UsersModule } from './users/users.module';
 import { VnpayModule } from './vnpay/vnpay.module';
+import { LikesModule } from './likes/likes.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { VnpayModule } from './vnpay/vnpay.module';
     VnpayModule,
     ChatModule,
     PayOSModule,
+    LikesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

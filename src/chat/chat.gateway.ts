@@ -29,20 +29,19 @@ export class ChatGateway implements OnModuleInit {
     @MessageBody() createChatDto: CreateChatDto,
     @ConnectedSocket() client: Socket,
   ) {
-
     const userId = (client as any).userId;
     await this.chatService.create(createChatDto, userId);
-
+    console.log(userId, createChatDto);
 
     this.server.emit(`${createChatDto.receiveUid}`, {
       receiveUid: userId,
       sender: 'friend',
-      message: createChatDto.message || createChatDto.file
+      message: createChatDto.message || createChatDto.file,
     });
 
-    this.server.emit(`tb${createChatDto.receiveUid}`,{
-      id: userId
-    })
+    this.server.emit(`tb${createChatDto.receiveUid}`, {
+      id: userId,
+    });
   }
 
   // @SubscribeMessage('findAllChat')

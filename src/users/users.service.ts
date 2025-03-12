@@ -1,3 +1,4 @@
+import { LikesService } from 'src/likes/likes.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -8,7 +9,10 @@ import { TokenPayload } from 'google-auth-library';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private UsersModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private UsersModel: Model<User>,
+    private LikesService: LikesService,
+  ) {}
 
   async create(RegisterDto: RegisterDto) {
     const { fullName, phoneNumber, gender, dob } = RegisterDto;
@@ -38,6 +42,26 @@ export class UsersService {
       throw new BadRequestException('Not Found!');
     }
     return user;
+  }
+
+  async getUserLikes(id: string) {
+    const userIds = await this.LikesService.getSourceUids(id);
+
+    const users = await this.UsersModel.find({
+      _id: { $in: userIds },
+    });
+
+    return users;
+  }
+
+  async getUserMatchs(id: string) {
+    const userIds = await this.LikesService.getMatch(id);
+
+    const users = await this.UsersModel.find({
+      _id: { $in: userIds },
+    });
+
+    return users;
   }
 
   // async checkPackage(id: string) {

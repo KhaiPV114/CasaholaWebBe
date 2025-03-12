@@ -12,6 +12,8 @@ import {
 import { UsersService } from 'src/users/users.service';
 import { User, UserSchema } from 'src/schemas/User.schema';
 import { MailService } from 'src/mail/mail.service';
+import { LikesService } from 'src/likes/likes.service';
+import { Likes, LikesSchema } from 'src/schemas/Likes.schema';
 
 @Module({
   imports: [
@@ -28,9 +30,19 @@ import { MailService } from 'src/mail/mail.service';
         name: ResetPWToken.name,
         schema: ResetPWTokenSchema,
       },
+      {
+        name: Likes.name,
+        schema: LikesSchema,
+      },
     ]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AccountService, UsersService, MailService],
+  providers: [
+    AuthService,
+    AccountService,
+    UsersService,
+    MailService,
+    LikesService,
+  ],
 })
 export class AuthModule {}

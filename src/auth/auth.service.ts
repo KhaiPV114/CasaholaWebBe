@@ -1,3 +1,4 @@
+import { LikesService } from './../likes/likes.service';
 import {
   BadRequestException,
   Injectable,
@@ -32,6 +33,7 @@ export class AuthService {
     private accountService: AccountService,
     private jwtService: JwtService,
     private mailService: MailService,
+    private likesService: LikesService,
   ) {
     this.client = new OAuth2Client(this.configService.get('google.id'));
   }
@@ -63,6 +65,10 @@ export class AuthService {
     }
     const { fullName, gender, dob, phoneNumber, packageType, _id } = user;
 
+    const likes = await this.likesService.getSourceUids(_id as string);
+
+    const matchs = await this.likesService.getMatch(_id as string);
+
     const token = await this.generateToken(_id);
     return {
       user: {
@@ -74,6 +80,8 @@ export class AuthService {
         phoneNumber,
         packageType,
       },
+      likes,
+      matchs,
       ...token,
     };
   }
@@ -227,6 +235,10 @@ export class AuthService {
     }
     const remember = await this.generateToken(_id);
 
+    const likes = await this.likesService.getSourceUids(_id as string);
+
+    const matchs = await this.likesService.getMatch(_id as string);
+
     return {
       user: {
         id: _id,
@@ -235,8 +247,10 @@ export class AuthService {
         gender,
         dob,
         phoneNumber,
-        packageType
+        packageType,
       },
+      likes,
+      matchs,
       ...remember,
     };
   }
