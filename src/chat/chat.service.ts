@@ -48,22 +48,21 @@ export class ChatService {
       ],
     });
 
-    const uids = [
-      ...new Set(
-        data.reduce((uid, d) => {
-          if (uidChoose) {
-            uid.push(uidChoose);
-          }
-          if (d.uidFirst.toString() !== sendUid) {
-            uid.push(d.uidFirst.toString());
-          }
-          if (d.uidSecord.toString() !== sendUid) {
-            uid.push(d.uidSecord.toString());
-          }
-          return uid;
-        }, [] as string[]),
-      ),
-    ];
+    const new_data = data.reduce((uid, d) => {
+      if (d.uidFirst.toString() !== sendUid) {
+        uid.push(d.uidFirst.toString());
+      }
+      if (d.uidSecord.toString() !== sendUid) {
+        uid.push(d.uidSecord.toString());
+      }
+      return uid;
+    }, [] as string[]);
+
+    if (uidChoose) {
+      new_data.push(uidChoose);
+    }
+
+    const uids = [...new Set(new_data)];
 
     const users = await this.userModel.find({
       _id: { $in: uids },
@@ -74,9 +73,10 @@ export class ChatService {
       return map;
     }, new Map());
 
-    return data
+    const result = data
       .map((d) => {
         let u: any;
+
         if (d.uidFirst.toString() !== sendUid) {
           u = userMap.get(d.uidFirst.toString());
         }
@@ -98,6 +98,21 @@ export class ChatService {
         };
       })
       .sort((a, b) => b.sendTime.getTime() - a.sendTime.getTime());
+
+    if (uidChoose) {
+      const chooseUser = userMap.get(uidChoose);
+      result.unshift({
+        _id: chooseUser._id,
+        fullName: chooseUser.fullName,
+        identificationImage: chooseUser.identificationImage,
+        profileImage: chooseUser.profileImage,
+        lastSend: new Types.ObjectId(sendUid),
+        status: true,
+        sendTime: new Date(),
+      });
+    }
+
+    return result;
   }
 
   async checkRoom(uidFrist: string, uidSecord: string) {
