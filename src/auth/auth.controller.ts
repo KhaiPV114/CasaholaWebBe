@@ -7,6 +7,7 @@ import {
   Put,
   Query,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -62,7 +63,6 @@ export class AuthController {
   @Put('reset-password')
   async resetPassword(@Body() resetPasswordDto: ResetPWTokenDto) {
     try {
-      console.log(resetPasswordDto)
       await this.authService.resetPassword(resetPasswordDto);
       return true;
     } catch (error) {
@@ -72,7 +72,11 @@ export class AuthController {
 
   @Post('account-remember')
   async accountRemember(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.accountRemember(refreshTokenDto.token);
+    try {
+      return this.authService.accountRemember(refreshTokenDto.token);
+    } catch (error) {
+      throw new UnauthorizedException();
+    }
   }
 
   @Get('check-reset-password')

@@ -38,4 +38,6 @@ export class RegisterDto {
   gender: string;
 
   profileImage?: string;
+
+  identificationImage?: string;
 }

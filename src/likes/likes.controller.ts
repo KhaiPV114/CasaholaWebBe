@@ -8,7 +8,7 @@ export class LikesController {
 
   @Post()
   async create(@Body() CreateLikeDto: CreateLikeDto) {
-    await this.likesService.create(CreateLikeDto);
+    return await this.likesService.create(CreateLikeDto);
   }
 
   @Put()

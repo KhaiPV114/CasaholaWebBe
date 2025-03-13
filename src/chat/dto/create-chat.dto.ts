@@ -1,10 +1,14 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
 export class CreateChatDto {
-    receiveUid: string;
+  receiveUid: string;
 
-    message?: string;
+  message?: string;
 
-    file?: string;
-    
+  file?: string;
+}
+
+export class LikesEventDto {
+  name: string;
+  receiveUid: string;
 }

@@ -9,9 +9,10 @@ export class LikesService {
   constructor(@InjectModel(Likes.name) private likeModel: Model<Likes>) {}
 
   async create(createLikeDto: CreateLikeDto) {
-    await this.likeModel.create({
+    const likes = await this.likeModel.create({
       ...createLikeDto,
     });
+    return likes._id;
   }
   async delete(CreateLikeDto: CreateLikeDto) {
     await this.likeModel.findOneAndDelete({

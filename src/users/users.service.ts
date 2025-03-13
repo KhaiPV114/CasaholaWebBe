@@ -15,13 +15,21 @@ export class UsersService {
   ) {}
 
   async create(RegisterDto: RegisterDto) {
-    const { fullName, phoneNumber, gender, dob, profileImage } = RegisterDto;
+    const {
+      fullName,
+      phoneNumber,
+      gender,
+      dob,
+      profileImage,
+      identificationImage,
+    } = RegisterDto;
     return await this.UsersModel.create({
       fullName,
       phoneNumber,
       gender,
       dob,
       profileImage,
+      identificationImage,
     });
   }
 

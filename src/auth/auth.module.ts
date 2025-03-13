@@ -14,6 +14,9 @@ import { User, UserSchema } from 'src/schemas/User.schema';
 import { MailService } from 'src/mail/mail.service';
 import { LikesService } from 'src/likes/likes.service';
 import { Likes, LikesSchema } from 'src/schemas/Likes.schema';
+import { ChatService } from 'src/chat/chat.service';
+import { ChatRoom, ChatRoomSchema } from 'src/schemas/ChatRoom.schema';
+import { StatusChat, StatusChatSchema } from 'src/schemas/StatusChat.schema';
 
 @Module({
   imports: [
@@ -34,6 +37,14 @@ import { Likes, LikesSchema } from 'src/schemas/Likes.schema';
         name: Likes.name,
         schema: LikesSchema,
       },
+      {
+        name: ChatRoom.name,
+        schema: ChatRoomSchema,
+      },
+      {
+        name: StatusChat.name,
+        schema: StatusChatSchema,
+      },
     ]),
   ],
   controllers: [AuthController],
@@ -43,6 +54,7 @@ import { Likes, LikesSchema } from 'src/schemas/Likes.schema';
     UsersService,
     MailService,
     LikesService,
+    ChatService,
   ],
 })
 export class AuthModule {}

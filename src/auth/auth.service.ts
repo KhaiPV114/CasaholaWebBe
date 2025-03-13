@@ -1,3 +1,4 @@
+import { ChatService } from './../chat/chat.service';
 import { LikesService } from './../likes/likes.service';
 import {
   BadRequestException,
@@ -34,6 +35,7 @@ export class AuthService {
     private jwtService: JwtService,
     private mailService: MailService,
     private likesService: LikesService,
+    private chatService: ChatService,
   ) {
     this.client = new OAuth2Client(this.configService.get('google.id'));
   }
@@ -69,6 +71,8 @@ export class AuthService {
 
     const matchs = await this.likesService.getMatch(_id as string);
 
+    const chats = await this.chatService.getNumberUnread(_id as string);
+
     const token = await this.generateToken(_id);
     return {
       user: {
@@ -82,6 +86,7 @@ export class AuthService {
       },
       likes,
       matchs,
+      chats,
       ...token,
     };
   }
@@ -218,41 +223,48 @@ export class AuthService {
   }
 
   async accountRemember(accessToken: string) {
-    const token = this.jwtService.verify(accessToken);
-    const { userId } = token;
+    try {
+      const token = this.jwtService.verify(accessToken);
+      const { userId } = token;
 
-    const user = await this.userModel.findById(userId);
-    if (!user) {
-      throw new UnauthorizedException('Wrong');
+      const user = await this.userModel.findById(userId);
+      if (!user) {
+        throw new UnauthorizedException('Wrong');
+      }
+      const { fullName, gender, dob, phoneNumber, _id, packageType } = user;
+
+      const account = await this.accountModel.findOne({
+        userId: _id,
+      });
+      if (!account) {
+        throw new UnauthorizedException('Wrong');
+      }
+      const remember = await this.generateToken(_id);
+
+      const likes = await this.likesService.getSourceUids(_id as string);
+
+      const matchs = await this.likesService.getMatch(_id as string);
+
+      const chats = await this.chatService.getNumberUnread(_id as string);
+
+      return {
+        user: {
+          id: _id,
+          email: account.email,
+          fullName,
+          gender,
+          dob,
+          phoneNumber,
+          packageType,
+        },
+        likes,
+        matchs,
+        chats,
+        ...remember,
+      };
+    } catch {
+      throw new UnauthorizedException();
     }
-    const { fullName, gender, dob, phoneNumber, _id, packageType } = user;
-
-    const account = await this.accountModel.findOne({
-      userId: _id,
-    });
-    if (!account) {
-      throw new UnauthorizedException('Wrong');
-    }
-    const remember = await this.generateToken(_id);
-
-    const likes = await this.likesService.getSourceUids(_id as string);
-
-    const matchs = await this.likesService.getMatch(_id as string);
-
-    return {
-      user: {
-        id: _id,
-        email: account.email,
-        fullName,
-        gender,
-        dob,
-        phoneNumber,
-        packageType,
-      },
-      likes,
-      matchs,
-      ...remember,
-    };
   }
 
   async checkResetPassword(token: string) {
@@ -261,7 +273,6 @@ export class AuthService {
       expires: { $gte: new Date() },
     });
 
-    console.log(token, reset);
     if (!reset) {
       return false;
     }
