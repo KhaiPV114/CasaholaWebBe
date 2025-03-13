@@ -99,7 +99,7 @@ export class ChatService {
       })
       .sort((a, b) => b.sendTime.getTime() - a.sendTime.getTime());
 
-    if (uidChoose) {
+    if (uidChoose && !result.find((r) => r._id.toString() === uidChoose)) {
       const chooseUser = userMap.get(uidChoose);
       result.unshift({
         _id: chooseUser._id,
