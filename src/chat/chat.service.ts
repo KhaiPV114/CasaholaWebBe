@@ -144,7 +144,7 @@ export class ChatService {
           { sendUid: receiveUid, receiveUid: sendUid },
         ],
       })
-      .sort({ timestamp: 1 });
+      .sort({ sendTime: 1 });
   }
 
   // async findDistinctReceivers(sendUid: string, chooseUid?: Types.ObjectId) {
