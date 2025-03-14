@@ -45,6 +45,8 @@ export class ChatGateway implements OnModuleInit {
     this.server.emit(`receiveMsg`, {
       id: createChatDto.receiveUid,
     });
+
+    return "ok";
   }
 
   @SubscribeMessage('likes')
